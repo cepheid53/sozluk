@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cepheid Scans - SFX Sözlüğü</title>
+    <link rel="icon" type="image/png" href="SENİN_İKON_LİNKİN_BURAYA">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         :root {
@@ -13,200 +14,191 @@
             --accent-color: #4da6ff;
             --border-color: #3f3f4e;
         }
-        body {
+        
+        /* BODY GÜNCELLENDİ: Sayfa tam ekran yüksekliğinde ve esnek */
+        body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
+            background-image: linear-gradient(rgba(26, 26, 36, 0.85), rgba(26, 26, 36, 0.85)), url('');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            margin: 0; 
+            padding: 0; 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh; /* Sayfanın en az ekran kadar uzun olmasını sağlar */
+        }
+
+        /* YENİ: ÜST MENÜ (NAVBAR) */
+        .navbar {
+            background-color: var(--panel-bg);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between; /* Logoyu sola, linkleri sağa iter */
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            position: sticky; /* Sayfa kaydırılsa bile üstte kalması için (isteğe bağlı) */
+            top: 0;
+            z-index: 50;
+        }
+
+        .logo-container img {
+            height: 40px; /* Logonun boyutu */
+            cursor: pointer;
+        }
+
+        .nav-links a {
             color: var(--text-color);
-            margin: 0;
-            padding: 20px;
+            text-decoration: none;
+            margin-left: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-color);
+        }
+
+        /* İÇERİK ALANI */
+        .page-wrapper {
+            flex-grow: 1; /* Ortadaki içeriğin tüm boşluğu doldurmasını sağlar (Footer'ı aşağı iter) */
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding: 30px 20px;
         }
-        .header-container {
-            text-align: center;
-            margin-bottom: 20px;
-            width: 100%;
-            max-width: 1200px;
-        }
-        h1 {
-            color: var(--accent-color);
-            border-bottom: 2px solid var(--accent-color);
-            padding-bottom: 10px;
-            display: inline-block;
-        }
-        .main-container {
-            display: flex;
-            gap: 20px;
-            width: 100%;
-            max-width: 1200px;
-        }
-        .sidebar {
+
+        .header-container { text-align: center; margin-bottom: 20px; width: 100%; max-width: 1200px; }
+        h1 { color: var(--accent-color); border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; display: inline-block; margin-top: 0; }
+        .main-container { display: flex; gap: 20px; width: 100%; max-width: 1300px; } 
+        
+        .sidebar { background-color: var(--panel-bg); padding: 15px; border-radius: 8px; min-width: 240px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); height: fit-content; max-height: 85vh; overflow-y: auto; }
+        .sidebar h3 { margin-top: 0; color: var(--accent-color); text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+        .letter-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+        
+        .letter-btn { background: none; border: 1px solid var(--border-color); color: var(--text-color); padding: 8px 2px; border-radius: 4px; cursor: pointer; text-align: center; transition: 0.2s; font-size: 14px; font-weight: bold; position: relative; }
+        .spacer { visibility: hidden; }
+
+        .letter-btn::after { content: attr(data-romaji); position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%); background-color: var(--accent-color); color: #fff; padding: 3px 6px; border-radius: 4px; font-size: 11px; white-space: nowrap; opacity: 0; visibility: hidden; transition: opacity 0.2s; pointer-events: none; box-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index: 10; }
+        .letter-btn:hover::after { opacity: 1; visibility: visible; }
+        .letter-btn:hover, .letter-btn.active { background-color: var(--accent-color); color: #fff; border-color: var(--accent-color); }
+        .full-list-btn { grid-column: span 5; margin-bottom: 10px; }
+        .full-list-btn::after { display: none; }
+
+        .content { flex-grow: 1; background-color: var(--panel-bg); padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); overflow-x: auto; }
+        .search-box { width: 100%; padding: 12px; font-size: 16px; margin-bottom: 20px; border: 1px solid var(--border-color); border-radius: 4px; background-color: #3f3f4e; color: white; box-sizing: border-box;}
+        
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: top; }
+        th { background-color: var(--bg-color); color: var(--accent-color); position: sticky; top: 0; z-index: 5; font-weight: bold; text-transform: uppercase; font-size: 0.9em; }
+        
+        th:nth-child(1), td:nth-child(1) { min-width: 180px; width: 200px; }
+        th:nth-child(2), td:nth-child(2) { width: 100px; color: #aaa; }
+
+        tr:hover { background-color: #353544; }
+        .loading { text-align: center; padding: 50px; font-size: 18px; color: var(--accent-color); }
+
+        .more-link { color: var(--accent-color); font-size: 0.85em; cursor: pointer; text-decoration: underline; margin-top: 5px; display: inline-block; }
+        .more-link:hover { color: #fff; }
+
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(3px); justify-content: center; align-items: center; }
+        .modal-content { background-color: var(--panel-bg); padding: 30px; border-radius: 8px; width: 90%; max-width: 700px; max-height: 85vh; overflow-y: auto; border: 1px solid var(--accent-color); box-shadow: 0 5px 15px rgba(0,0,0,0.5); position: relative; }
+        .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; margin-top: -15px; }
+        .close-btn:hover { color: #fff; }
+        #modalDetails { margin-top: 20px; line-height: 1.6; color: #ddd; text-align: center; }
+
+        /* YENİ: ALT BİLGİ (FOOTER) */
+        footer {
             background-color: var(--panel-bg);
-            padding: 15px;
-            border-radius: 8px;
-            min-width: 180px;
-            height: fit-content;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .sidebar h3 {
-            margin-top: 0;
-            color: var(--accent-color);
             text-align: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-        }
-        .letter-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
-        }
-        
-        /* Harf Butonu Temel Tasarımı */
-        .letter-btn {
-            background: none;
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            padding: 8px 5px;
-            border-radius: 4px;
-            cursor: pointer;
-            text-align: center;
-            transition: 0.2s;
-            font-size: 14px;
-            font-weight: bold;
-            position: relative; /* Baloncuğun yerini ayarlamak için önemli */
-        }
-        
-        /* HOVER: Bilgi Baloncuğu (Tooltip) Tasarımı */
-        .letter-btn::after {
-            content: attr(data-romaji); /* Datadan romajiyi çeker */
-            position: absolute;
-            bottom: 110%; /* Butonun hemen üstünde çıkar */
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: var(--accent-color);
-            color: #fff;
-            padding: 3px 6px;
-            border-radius: 4px;
-            font-size: 11px;
-            white-space: nowrap;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.2s ease, visibility 0.2s ease;
-            pointer-events: none;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            z-index: 10;
-        }
-
-        /* Üstüne gelindiğinde baloncuğu göster */
-        .letter-btn:hover::after {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .letter-btn:hover, .letter-btn.active {
-            background-color: var(--accent-color);
-            color: #fff;
-            border-color: var(--accent-color);
-        }
-        
-        .full-list-btn {
-            grid-column: span 3;
-            margin-bottom: 10px;
-        }
-        .full-list-btn::after {
-            display: none; /* "Tüm Liste" butonunda baloncuk çıkmasın */
-        }
-
-        .content {
-            flex-grow: 1;
-            background-color: var(--panel-bg);
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            overflow-x: auto;
+            font-size: 14px;
+            color: #888;
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.3);
         }
-        .search-box {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            margin-bottom: 20px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            background-color: #3f3f4e;
-            color: white;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-        th {
-            background-color: var(--bg-color);
+        footer a {
             color: var(--accent-color);
-            position: sticky;
-            top: 0;
-            z-index: 5;
+            text-decoration: none;
         }
-        tr:hover {
-            background-color: #353544;
+        footer a:hover {
+            text-decoration: underline;
         }
-        .loading {
-            text-align: center;
-            padding: 50px;
-            font-size: 18px;
-            color: var(--accent-color);
-        }
-        @media (max-width: 768px) {
-            .main-container { flex-direction: column; }
-            .sidebar { max-height: none; }
+
+        @media (max-width: 768px) { 
+            .main-container { flex-direction: column; } 
+            .sidebar { max-height: none; } 
+            .navbar { flex-direction: column; gap: 15px; } /* Mobilde menü alt alta iner */
+            .nav-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;}
+            .nav-links a { margin: 0; }
         }
     </style>
 </head>
 <body>
 
-<div class="header-container">
-    <h1>Cepheid Scans - SFX Sözlüğü</h1>
-</div>
+<nav class="navbar">
+    <div class="logo-container">
+        <a href="#"><img src="https://i.ibb.co/RpcJBBrR/cepheidyeni.png" alt="Cepheid Scans Logo"></a>
+    </div>
+    <div class="nav-links">
+        <a href="#">Ana Sayfa</a>
+        <a href="https://discord.gg/uVqCHzkxYq">Discord</a>
+        <a href="https://cepheidscans.blogspot.com">Sitemiz</a>
+    </div>
+</nav>
 
-<div class="main-container">
-    <div class="sidebar">
-        <h3>Kanalara Göre</h3>
-        <div class="letter-grid">
-            <button class="letter-btn active full-list-btn" onclick="filterByLetter('Hepsi')">Tüm Liste</button>
-            <div id="letterContainer" style="display: contents;">
-                </div>
-        </div>
+<div class="page-wrapper">
+    <div class="header-container">
+        <h1>Cepheid Scans - SFX Sözlüğü</h1>
     </div>
 
-    <div class="content">
-        <input type="text" id="searchInput" class="search-box" placeholder="Hızlı ara (Japonca, Romaji, Türkçe)...">
-        <table>
-            <thead>
-                <tr>
-                    <th>Japonca</th>
-                    <th>Romaji</th>
-                    <th>Türkçe Anlamı</th>
-                    <th>Açıklama</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <tr><td colspan="4" class="loading">Veritabanı yükleniyor...</td></tr>
-            </tbody>
-        </table>
+    <div class="main-container">
+        <div class="sidebar">
+            <h3>Kanalara Göre</h3>
+            <div class="letter-grid">
+                <button class="letter-btn active full-list-btn" onclick="filterByLetter('Hepsi')">Tüm Liste</button>
+                <div id="letterContainer" style="display: contents;"></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <input type="text" id="searchInput" class="search-box" placeholder="Seçili harf içinde ara (Japonca, Romaji, Türkçe)...">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Japonca</th>
+                        <th>Romaji</th>
+                        <th>Türkçe Anlamı</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="4" class="loading">Veritabanı yükleniyor...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2026 Cepheid Scans. Tüm hakları saklıdır.</p>
+    <p>Geliştirici: Tuğra | <a href="https://discord.gg/uVqCHzkxYq">Discord Sunucumuz</a></p>
+</footer>
+
+<div id="exampleModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2 id="modalTitle" style="color: var(--accent-color); margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; text-align: left;"></h2>
+        <div id="modalDetails"></div>
     </div>
 </div>
 
 <script>
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTvI9TzWNvNo1xMHE1t8lmeY8Ma6gsVxA0pftYke_tw7nOykjkQLypp1AjOl2iaN000i2dpvquzgRhX/pub?gid=0&single=true&output=csv";
     
-    // Harfler ve Okunuşları (Romaji Eşleştirmesi Eklendi)
     const katakanaList = [
         { k:"ア", r:"a" }, { k:"イ", r:"i" }, { k:"ウ", r:"u" }, { k:"エ", r:"e" }, { k:"オ", r:"o" },
         { k:"カ", r:"ka" }, { k:"キ", r:"ki" }, { k:"ク", r:"ku" }, { k:"ケ", r:"ke" }, { k:"コ", r:"ko" },
@@ -215,17 +207,18 @@
         { k:"ナ", r:"na" }, { k:"ニ", r:"ni" }, { k:"ヌ", r:"nu" }, { k:"ネ", r:"ne" }, { k:"ノ", r:"no" },
         { k:"ハ", r:"ha" }, { k:"ヒ", r:"hi" }, { k:"フ", r:"fu" }, { k:"ヘ", r:"he" }, { k:"ホ", r:"ho" },
         { k:"マ", r:"ma" }, { k:"ミ", r:"mi" }, { k:"ム", r:"mu" }, { k:"メ", r:"me" }, { k:"モ", r:"mo" },
-        { k:"ヤ", r:"ya" }, { k:"ユ", r:"yu" }, { k:"ヨ", r:"yo" },
+        { k:"ヤ", r:"ya" }, { k:"", r:"" },    { k:"ユ", r:"yu" }, { k:"", r:"" },    { k:"ヨ", r:"yo" },
         { k:"ラ", r:"ra" }, { k:"リ", r:"ri" }, { k:"ル", r:"ru" }, { k:"レ", r:"re" }, { k:"ロ", r:"ro" },
-        { k:"ワ", r:"wa" }, { k:"ヲ", r:"wo" }, { k:"ン", r:"n" }
+        { k:"ワ", r:"wa" }, { k:"", r:"" },    { k:"", r:"" },    { k:"", r:"" },    { k:"ヲ", r:"wo" },
+        { k:"ン", r:"n" }
     ];
     
     let allData = [];
+    let currentCategory = 'Hepsi'; 
 
-    // Kelimenin ilk Japonca karakterini temizleyen fonksiyon
     function getCleanFirstChar(str) {
         let char = str.trim().charAt(0);
-        return char.normalize('NFD').charAt(0); // Dakuten işaretlerini temizler
+        return char.normalize('NFD').charAt(0);
     }
 
     Papa.parse(csvUrl, {
@@ -235,7 +228,144 @@
             let rows = results.data;
             rows.shift(); 
 
-            allData = rows.map(row => ({
+            allData = rows.map((row, index) => ({
+                id: index,
                 japanese: row[0] ? row[0].trim() : '',
                 romaji: row[1] ? row[1].trim() : '',
-                turkish: row[2]
+                turkish: row[2] ? row[2].trim() : '',
+                explanation: row[3] ? row[3].trim() : '',
+                example: row[4] ? row[4].trim() : '' 
+            })).filter(item => item.romaji !== '' || item.japanese !== '');
+
+            // YENİ SIRALAMA MANTIĞI: Kısadan Uzuna
+            allData.sort((a, b) => {
+                // 1. Kural: Önce kelime uzunluklarına bak (Kısadan uzuna sırala)
+                if (a.japanese.length !== b.japanese.length) {
+                    return a.japanese.length - b.japanese.length;
+                }
+                // 2. Kural: Eğer iki kelimenin harf sayısı (uzunluğu) aynıysa, alfabeye göre sırala
+                return a.japanese.localeCompare(b.japanese, 'ja');
+            });
+
+            initSidebar();
+            renderTable(allData);
+        }
+    });
+
+    function initSidebar() {
+        const container = document.getElementById('letterContainer');
+        katakanaList.forEach(item => {
+            if (item.k === "") {
+                let spacer = document.createElement('div');
+                spacer.className = 'spacer';
+                container.appendChild(spacer);
+            } else {
+                let btn = document.createElement('button');
+                btn.className = 'letter-btn';
+                btn.innerText = item.k;              
+                btn.setAttribute('data-romaji', item.r); 
+                btn.onclick = () => filterByLetter(item.k, btn);
+                container.appendChild(btn);
+            }
+        });
+    }
+
+    function renderTable(data) {
+        const tbody = document.getElementById('tableBody');
+
+        if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#aaa;">Bu kategoriye uygun sonuç bulunamadı.</td></tr>';
+            return;
+        }
+
+        // YENİ: Bütün HTML satırlarını burada toplayacağız (Tuğla kutusu)
+        let tableHTML = '';
+
+        data.forEach(item => {
+            let formattedJapanese = item.japanese.replace(/,\s*/g, ',<br>').replace(/\n/g, '<br>');
+            let formattedTurkish = item.turkish.replace(/(\(\d+\))/g, '<br><span style="color:var(--accent-color); font-weight:bold;">$1</span>').replace(/^<br>/, '');
+            let formattedExp = item.explanation.replace(/(\(\d+\))/g, '<br><span style="color:var(--accent-color);">$1</span>').replace(/^<br>/, '');
+            let moreButton = item.example !== '' ? `<br><span class="more-link" onclick="openModal(${item.id})">Daha Fazla Örnek »</span>` : '';
+
+            // Tek tek ekrana basmak yerine kutunun içine atıyoruz
+            tableHTML += `
+                <tr>
+                    <td style="font-size: 1.25em; font-weight: bold; line-height: 1.4; color: #fff;">${formattedJapanese}</td>
+                    <td style="font-size: 1.05em;">${item.romaji}</td>
+                    <td>${formattedTurkish}</td>
+                    <td style="font-size: 0.9em; color: #bbb;">${formattedExp} ${moreButton}</td>
+                </tr>`;
+        });
+
+        // YENİ: Döngü bittiğinde bütün kelimeleri TEK SEFERDE ekrana yapıştırıyoruz
+        tbody.innerHTML = tableHTML;
+    }
+
+    function filterByLetter(letter, btnElement = null) {
+        currentCategory = letter; 
+
+        document.querySelectorAll('.letter-btn').forEach(b => b.classList.remove('active'));
+        if(btnElement) btnElement.classList.add('active');
+        else document.querySelector('.full-list-btn').classList.add('active');
+
+        document.getElementById('searchInput').value = '';
+
+        if (letter === 'Hepsi') {
+            renderTable(allData);
+        } else {
+            let filtered = allData.filter(item => getCleanFirstChar(item.japanese) === letter);
+            renderTable(filtered);
+        }
+    }
+
+    // YENİ: Arama çubuğu için bekleme (Debounce) sayacı
+    let aramaZamanlayici;
+
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const term = this.value.toLowerCase();
+        
+        // Kullanıcı her tuşa bastığında önceki sayacı sıfırla (aramayı iptal et)
+        clearTimeout(aramaZamanlayici);
+
+        // Kullanıcı yazmayı bıraktıktan 300 milisaniye (0.3 saniye) sonra aramayı yap
+        aramaZamanlayici = setTimeout(() => {
+            let searchPool = allData;
+            if (currentCategory !== 'Hepsi') {
+                searchPool = allData.filter(item => getCleanFirstChar(item.japanese) === currentCategory);
+            }
+
+            let filtered = searchPool.filter(item => 
+                item.japanese.toLowerCase().includes(term) ||
+                item.romaji.toLowerCase().includes(term) ||
+                item.turkish.toLowerCase().includes(term) ||
+                item.explanation.toLowerCase().includes(term)
+            );
+            renderTable(filtered);
+        }, 300); // Bekleme süresi (İstersen bu sayıyı 500 yapıp yarım saniye de beklemesini sağlayabilirsin)
+    });
+
+    const modal = document.getElementById('exampleModal');
+
+    function openModal(id) {
+        const item = allData.find(x => x.id === id);
+        document.getElementById('modalTitle').innerText = `${item.japanese} (${item.romaji})`;
+        
+        let formattedExample = item.example;
+        formattedExample = formattedExample.replace(/(\(\d+\))/g, '<br><br><span style="color:var(--accent-color); font-weight:bold; text-align:left; display:block;">$1</span>').replace(/^<br><br>/, '');
+        formattedExample = formattedExample.replace(/(https?:\/\/[^\s]+)/g, function(url) {
+            if(url.match(/\.(jpeg|jpg|gif|png|webp)/i)) {
+                return `<br><img src="${url}" style="max-width: 100%; border-radius: 8px; margin: 15px 0; box-shadow: 0 4px 8px rgba(0,0,0,0.5);"><br>`;
+            } else {
+                return `<a href="${url}" target="_blank" style="color:var(--accent-color); text-decoration:underline;">${url}</a>`;
+            }
+        });
+
+        document.getElementById('modalDetails').innerHTML = formattedExample;
+        modal.style.display = 'flex';
+    }
+
+    function closeModal() { modal.style.display = 'none'; }
+    window.onclick = function(event) { if (event.target == modal) { closeModal(); } }
+</script>
+</body>
+</html>
