@@ -69,6 +69,8 @@
             cursor: pointer;
             text-align: center;
             transition: 0.2s;
+            font-size: 16px;
+            font-weight: bold;
         }
         .letter-btn:hover, .letter-btn.active {
             background-color: var(--accent-color);
@@ -121,7 +123,6 @@
             font-size: 18px;
             color: var(--accent-color);
         }
-        /* Mobilde ekranın bozulmaması için alt alta dizilim */
         @media (max-width: 768px) {
             .main-container {
                 flex-direction: column;
@@ -173,19 +174,23 @@
 </div>
 
 <script>
-    // Aldığın Orijinal Google E-Tablo Linki
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTvI9TzWNvNo1xMHE1t8lmeY8Ma6gsVxA0pftYke_tw7nOykjkQLypp1AjOl2iaN000i2dpvquzgRhX/pub?gid=0&single=true&output=csv";
 
     let allData = []; 
+
+    // Kelimenin içindeki ilk Japonca karakteri (Hiragana/Katakana) bulan fonksiyon
+    function getFirstKana(str) {
+        let match = str.match(/[ぁ-んァ-ン]/);
+        return match ? match[0] : '';
+    }
 
     Papa.parse(csvUrl, {
         download: true,
         header: false, 
         complete: function(results) {
             let rows = results.data;
-            rows.shift(); // 1. satırdaki başlıkları (Japonca, Romaji vs) yoksay
+            rows.shift(); 
 
-            // Verileri temizle ve boş satırları at
             allData = rows.map(row => ({
                 japanese: row[0] ? row[0].trim() : '',
                 romaji: row[1] ? row[1].trim() : '',
@@ -193,13 +198,10 @@
                 explanation: row[3] ? row[3].trim() : ''
             })).filter(item => item.romaji !== '' || item.japanese !== '');
 
-            // Kelimeleri Romaji okunuşuna göre A-Z'ye otomatik sırala
-            allData.sort((a, b) => a.romaji.localeCompare(b.romaji));
+            // Artık tabloyu Japonca Gojūon sırasına (A, I, U, E, O, Ka, Ki...) göre sıralıyoruz
+            allData.sort((a, b) => a.japanese.localeCompare(b.japanese, 'ja'));
 
-            // Sol menüdeki harf butonlarını oluştur
             createLetterButtons();
-
-            // Tabloyu ekrana yansıt
             renderTable(allData);
         },
         error: function() {
@@ -207,7 +209,6 @@
         }
     });
 
-    // Tabloyu Çizen Fonksiyon
     function renderTable(data) {
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
@@ -218,7 +219,6 @@
         }
 
         data.forEach(item => {
-            // Excel'de (1), (2) yazılırsa otomatik olarak alt satıra geçirme zekası
             let formattedTurkish = item.turkish.replace(/(\(\d+\))/g, '<br><span style="color:var(--accent-color);">$1</span>').replace(/^<br>/, '');
             let formattedExp = item.explanation.replace(/(\(\d+\))/g, '<br><span style="color:var(--accent-color);">$1</span>').replace(/^<br>/, '');
 
@@ -233,24 +233,24 @@
         });
     }
 
-    // Harf Butonlarını Excel'e Bakıp Oluşturan Fonksiyon
     function createLetterButtons() {
         const container = document.getElementById('letterContainer');
         
-        // Sadece baş harfleri al, büyük harf yap, tekrarları sil
-        let letters = [...new Set(allData.map(item => item.romaji.charAt(0).toUpperCase()))].filter(l => l.match(/[A-Z]/));
-        letters.sort(); 
+        // İlk Japonca karakteri al ve tekrarları sil
+        let letters = [...new Set(allData.map(item => getFirstKana(item.japanese)))].filter(l => l !== '');
+        
+        // Japonca alfabe sırasına göre diz
+        letters.sort((a, b) => a.localeCompare(b, 'ja')); 
 
         letters.forEach(letter => {
             let btn = document.createElement('button');
             btn.className = 'letter-btn';
-            btn.innerText = letter;
+            btn.innerText = letter; // Artık butonun üstünde Japonca harf yazacak
             btn.onclick = () => filterByLetter(letter, btn);
             container.appendChild(btn);
         });
     }
 
-    // Yan Menüden Harfe Tıklanınca Çalışan Filtre
     function filterByLetter(letter, btnElement = null) {
         document.querySelectorAll('.letter-btn').forEach(b => b.classList.remove('active'));
         if(btnElement) {
@@ -264,12 +264,12 @@
         if (letter === 'Hepsi') {
             renderTable(allData);
         } else {
-            let filtered = allData.filter(item => item.romaji.charAt(0).toUpperCase() === letter);
+            // Sadece başındaki Japonca karakteri uyanları filtrele
+            let filtered = allData.filter(item => getFirstKana(item.japanese) === letter);
             renderTable(filtered);
         }
     }
 
-    // Arama Çubuğu (Anlık Filtreleme)
     document.getElementById('searchInput').addEventListener('keyup', function() {
         document.querySelectorAll('.letter-btn').forEach(b => b.classList.remove('active'));
         document.querySelector('.sidebar button').classList.add('active');
