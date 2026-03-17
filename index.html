@@ -147,6 +147,7 @@
         <a href="#">Ana Sayfa</a>
         <a href="https://discord.gg/uVqCHzkxYq">Discord</a>
         <a href="https://cepheidscans.blogspot.com">Sitemiz</a>
+        <a href="credits.html">Emeği Geçenler</a>
     </div>
 </nav>
 
@@ -238,14 +239,11 @@
             })).filter(item => item.romaji !== '' || item.japanese !== '');
 
             // YENİ SIRALAMA MANTIĞI: Kısadan Uzuna
+            // YENİ SIRALAMA MANTIĞI: Romaji Alfabesine Göre (A'dan Z'ye)
+            // Bu yöntem otomatik olarak kök kelimeyi başa, uzantılarını (kısadan uzuna) arkasına dizer.
             allData.sort((a, b) => {
-                // 1. Kural: Önce kelime uzunluklarına bak (Kısadan uzuna sırala)
-                if (a.japanese.length !== b.japanese.length) {
-                    return a.japanese.length - b.japanese.length;
-                }
-                // 2. Kural: Eğer iki kelimenin harf sayısı (uzunluğu) aynıysa, alfabeye göre sırala
-                return a.japanese.localeCompare(b.japanese, 'ja');
-            });
+                    return a.romaji.localeCompare(b.romaji, 'en');
+                });
 
             initSidebar();
             renderTable(allData);

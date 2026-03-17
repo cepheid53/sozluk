@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emeği Geçenler - Cepheid Scans</title>
+    <style>
+        :root {
+            --bg-color: #1a1a24;
+            --panel-bg: #2b2b36;
+            --text-color: #f5f5f5;
+            --accent-color: #4da6ff;
+            --border-color: #3f3f4e;
+        }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            
+            background-image: linear-gradient(rgba(26, 26, 36, 0.9), rgba(26, 26, 36, 0.9)), url('https://i.ibb.co/V0dBL21b/rizespor-6-1.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            
+            color: var(--text-color); 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            width: 90%;
+            margin: 50px 0;
+            background: rgba(43, 43, 54, 0.8); 
+            backdrop-filter: blur(10px); 
+            
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        h1 { color: var(--accent-color); border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
+        .credit-section { margin-top: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .card {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            transition: 0.3s;
+        }
+        /* YENİ: Daire Profil Fotoğrafı Tasarımı */
+        .avatar {
+            width: 80px;  /* Fotoğrafın genişliği */
+            height: 80px; /* Fotoğrafın yüksekliği (Kare olmalı) */
+            border-radius: 50%; /* Resme daire şeklini verir */
+            object-fit: cover; /* Resim sığmazsa kırpar, ezmez */
+            margin-bottom: 15px; /* Altındaki isme boşluk bırakır */
+            border: 3px solid var(--border-color); /* Hafif bir çerçeve */
+            transition: 0.3s;
+        }
+        .card:hover .avatar {
+            border-color: var(--accent-color); /* Kartın üzerine gelince çerçeve renklensin */
+        }
+        .card:hover { border-color: var(--accent-color); transform: translateY(-5px); }
+        .role { color: var(--accent-color); font-weight: bold; font-size: 0.9em; text-transform: uppercase; }
+        .name { font-size: 1.2em; margin: 10px 0; display: block; }
+        .back-btn {
+            margin-top: 40px;
+            display: inline-block;
+            color: var(--text-color);
+            text-decoration: none;
+            border: 1px solid var(--accent-color);
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .back-btn:hover { background: var(--accent-color); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Emeği Geçenler</h1>
+    <p>Bu sözlüğün hazırlanmasında ve güncel tutulmasında payı olan tüm ekip üyelerimize teşekkür ederiz. Not: Bu sözlüğün yapımında yapay zeka teknolojisi de kullanılmıştır, ancak içeriklerin doğruluğu ve kalitesi insan kontrolünden geçmiştir.
+    </p>
+
+    <div class="credit-section">
+        <!-- ÖRNEK KARTLAR: Buradaki isimleri değiştirebilirsin -->
+        <div class="card">
+            <img src="https://i.ibb.co/WvycxRnB/64b7644f1ff04c7220c63acfd09bc260.png" alt="Tuğra Profil Fotoğrafı" class="avatar">
+            <br>
+            <span class="role">Geliştirici</span>
+            <span class="name">Tuğra</span>
+        </div>
+        <div class="card">
+            <img src="https://i.ibb.co/Hp1tNPzV/10248b369b3086eec34e5539aa64e2a9.png" alt="Ekip Üyesi 1 Profil Fotoğrafı" class="avatar">
+            <br>
+            <span class="role">Çevirmen</span>
+            <span class="name">Taurdalë</span>
+        </div>
+    </div>
+
+    <a href="index.html" class="back-btn">← Sözlüğe Geri Dön</a>
+</div>
+
+</body>
+</html>
