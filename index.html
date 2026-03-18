@@ -39,16 +39,17 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            position: sticky;
+            position: fixed;
             top: 0;
+            left: 0;
+            right: 0;
             z-index: 50;
-            transition: transform 0.3s ease, opacity 0.3s ease;
+            transition: transform 0.3s ease;
         }
         .navbar.hidden {
             transform: translateY(-100%);
-            opacity: 0;
-            pointer-events: none;
         }
+        body { padding-top: 70px; }
 
         .logo-container img {
             height: 40px; /* Logonun boyutu */
@@ -446,20 +447,20 @@
 
     const scrollBtn = document.getElementById('scrollTopBtn');
     const navbar = document.querySelector('.navbar');
-    let lastScrollY = 0;
 
     window.addEventListener('scroll', () => {
         const currentScrollY = window.scrollY;
 
-        // Navbar gizle/göster
-        if (currentScrollY > 10 && currentScrollY > lastScrollY) {
-            navbar.classList.add('hidden');
+        if (window.innerWidth <= 768) {
+            if (currentScrollY <= 10) {
+                navbar.classList.remove('hidden');
+            } else {
+                navbar.classList.add('hidden');
+            }
         } else {
             navbar.classList.remove('hidden');
         }
-        lastScrollY = currentScrollY;
 
-        // Başa dön butonu
         scrollBtn.style.display = currentScrollY > 300 ? 'block' : 'none';
     });
 </script>
