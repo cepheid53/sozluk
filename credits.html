@@ -15,6 +15,7 @@
             --role-developer: #f4a261;
             --role-translator: #2ec4b6;
             --role-editor: #e63946;
+            --role-tester: #a78bfa;
             --role-default: #4da6ff;
         }
         body { 
@@ -46,35 +47,40 @@
             border: 1px solid var(--border-color);
         }
         h1 { color: var(--accent-color); border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
-        .credit-section { margin-top: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .credit-section { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
         .card {
             background: rgba(255,255,255,0.05);
             padding: 20px;
             border-radius: 10px;
             border: 1px solid var(--border-color);
             transition: 0.3s;
+            width: 200px;
+            box-sizing: border-box;
         }
+        /* YENİ: Daire Profil Fotoğrafı Tasarımı */
         .avatar {
-            width: 80px; 
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 15px;
-            border: 3px solid var(--border-color); 
+            width: 80px;  /* Fotoğrafın genişliği */
+            height: 80px; /* Fotoğrafın yüksekliği (Kare olmalı) */
+            border-radius: 50%; /* Resme daire şeklini verir */
+            object-fit: cover; /* Resim sığmazsa kırpar, ezmez */
+            margin-bottom: 15px; /* Altındaki isme boşluk bırakır */
+            border: 3px solid var(--border-color); /* Hafif bir çerçeve */
             transition: 0.3s;
         }
         .card:hover .avatar {
-            border-color: var(--accent-color);
+            border-color: var(--accent-color); /* Kartın üzerine gelince çerçeve renklensin */
         }
         .card:hover { transform: translateY(-5px); }
         .card:has(.role[data-type="gelistirici"]):hover  { border-color: var(--role-developer); }
         .card:has(.role[data-type="cevirmen"]):hover     { border-color: var(--role-translator); }
         .card:has(.role[data-type="editor"]):hover       { border-color: var(--role-editor); }
+        .card:has(.role[data-type="tester"]):hover       { border-color: var(--role-tester); }
         .card:hover .avatar { border-color: var(--accent-color); }
         .role { font-weight: bold; font-size: 0.9em; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; display: inline-block; margin-bottom: 5px; }
         .role[data-type="gelistirici"]  { background: rgba(244,162,97,0.15);  color: var(--role-developer);  border: 1px solid var(--role-developer); }
         .role[data-type="cevirmen"]     { background: rgba(46,196,182,0.15);  color: var(--role-translator); border: 1px solid var(--role-translator); }
         .role[data-type="editor"]       { background: rgba(230,57,70,0.15);   color: var(--role-editor);     border: 1px solid var(--role-editor); }
+        .role[data-type="tester"]       { background: rgba(167,139,250,0.15); color: var(--role-tester);     border: 1px solid var(--role-tester); }
         .role:not([data-type])          { background: rgba(77,166,255,0.15);  color: var(--role-default);    border: 1px solid var(--role-default); }
         .name { font-size: 1.2em; margin: 10px 0; display: block; }
         .back-btn {
@@ -98,7 +104,7 @@
     </p>
 
     <div class="credit-section">
-        <!-- KARTLAR -->
+        <!-- ÖRNEK KARTLAR: Buradaki isimleri değiştirebilirsin -->
         <div class="card">
             <img src="https://i.ibb.co/WvycxRnB/64b7644f1ff04c7220c63acfd09bc260.png" alt="Tuğra Profil Fotoğrafı" class="avatar">
             <br>
@@ -116,6 +122,37 @@
             <br>
             <span class="role" data-type="cevirmen">Çevirmen</span>
             <span class="name">Judas</span>
+        </div>
+        <div class="card">
+            <img src="https://i.ibb.co/20StPNx2/936b173320aa107b05a38687163275cb.png" alt="..." class="avatar">
+            <br>
+            <span class="role" data-type="editor">Editör</span>
+            <span class="name">kidemo</span>
+        </div>
+        <div class="card">
+            <img src="https://i.ibb.co/XkjhXvR6/6526c609e8bb8475b8a7f875e3000044.png" alt="..." class="avatar">
+            <br>
+            <span class="role" data-type="editor">Editör</span>
+            <span class="name">ikusaba</span>
+        </div>
+    </div>
+
+    <div style="margin-top: 50px;">
+        <h2 style="color: #a78bfa; border-bottom: 2px solid #a78bfa; padding-bottom: 10px; display: inline-block;">Test Edenler</h2>
+        <p style="color: #aaa; font-size: 0.9em;">Sözlüğün doğruluğunu ve kullanılabilirliğini test eden kişiler.</p>
+        <div class="credit-section">
+            <div class="card">
+                <img src="https://i.ibb.co/Q3mdKCFq/ff1d100b71736bb8490e9948f1187615.png" alt="Test Eden 1" class="avatar" onerror="this.style.background='#3f3f4e';this.src='https://placehold.co/80x80/3f3f4e/a78bfa?text=?'">
+                <br>
+                <span class="role" data-type="tester">Test Eden</span>
+                <span class="name">Stump</span>
+            </div>
+            <div class="card">
+                <img src="https://i.ibb.co/gM2DJhJq/bbf5fb4f3c285e28b952801c5b1d5014.png" alt="Test Eden 2" class="avatar" onerror="this.style.background='#3f3f4e';this.src='https://placehold.co/80x80/3f3f4e/a78bfa?text=?'">
+                <br>
+                <span class="role" data-type="tester">Test Eden</span>
+                <span class="name">Eikon</span>
+            </div>
         </div>
     </div>
 
