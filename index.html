@@ -15,7 +15,7 @@
             --border-color: #3f3f4e;
         }
         
-        /* BODY GÜNCELLENDİ: Sayfa tam ekran yüksekliğinde ve esnek */
+        /* BODY */
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-image: linear-gradient(rgba(26, 26, 36, 0.85), rgba(26, 26, 36, 0.85)), url('');
@@ -28,10 +28,10 @@
             padding: 0; 
             display: flex; 
             flex-direction: column; 
-            min-height: 100vh; /* Sayfanın en az ekran kadar uzun olmasını sağlar */
+            min-height: 100vh; 
         }
 
-        /* YENİ: ÜST MENÜ (NAVBAR) */
+        /* ÜST MENÜ (NAVBAR) */
         .navbar {
             background-color: var(--panel-bg);
             padding: 15px 40px;
@@ -52,7 +52,7 @@
         body { padding-top: 70px; }
 
         .logo-container img {
-            height: 40px; /* Logonun boyutu */
+            height: 40px; 
             cursor: pointer;
         }
 
@@ -71,7 +71,7 @@
 
         /* İÇERİK ALANI */
         .page-wrapper {
-            flex-grow: 1; /* Ortadaki içeriğin tüm boşluğu doldurmasını sağlar (Footer'ı aşağı iter) */
+            flex-grow: 1; 
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -175,7 +175,6 @@
             .nav-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;}
             .nav-links a { margin: 0; }
 
-            /* Mobilde tablo gizle, kart görünümü göster */
             table thead { display: none; }
             table, tbody, tr, td { display: block; width: 100%; }
             tr {
@@ -314,9 +313,6 @@
                 example: row[4] ? row[4].trim() : '' 
             })).filter(item => item.romaji !== '' || item.japanese !== '');
 
-            // YENİ SIRALAMA MANTIĞI: Kısadan Uzuna
-            // YENİ SIRALAMA MANTIĞI: Romaji Alfabesine Göre (A'dan Z'ye)
-            // Bu yöntem otomatik olarak kök kelimeyi başa, uzantılarını (kısadan uzuna) arkasına dizer.
             allData.sort((a, b) => {
                     return a.romaji.localeCompare(b.romaji, 'en');
                 });
@@ -356,7 +352,6 @@
 
         counter.innerHTML = `Toplam <span>${allData.length}</span> kelimeden <span>${data.length}</span> tanesi gösteriliyor`;
 
-        // YENİ: Bütün HTML satırlarını burada toplayacağız (Tuğla kutusu)
         let tableHTML = '';
 
         data.forEach(item => {
@@ -365,7 +360,6 @@
             let formattedExp = item.explanation.replace(/(\(\d+\))/g, '<br><span style="color:var(--accent-color);">$1</span>').replace(/^<br>/, '');
             let moreButton = item.example !== '' ? `<br><span class="more-link" onclick="openModal(${item.id})">Daha Fazla Örnek »</span>` : '';
 
-            // Tek tek ekrana basmak yerine kutunun içine atıyoruz
             tableHTML += `
                 <tr>
                     <td style="font-size: 1.25em; font-weight: bold; line-height: 1.4; color: #fff;">${formattedJapanese}</td>
@@ -375,7 +369,6 @@
                 </tr>`;
         });
 
-        // YENİ: Döngü bittiğinde bütün kelimeleri TEK SEFERDE ekrana yapıştırıyoruz
         tbody.innerHTML = tableHTML;
     }
 
@@ -396,16 +389,15 @@
         }
     }
 
-    // YENİ: Arama çubuğu için bekleme (Debounce) sayacı
     let aramaZamanlayici;
 
     document.getElementById('searchInput').addEventListener('keyup', function() {
         const term = this.value.toLowerCase();
         
-        // Kullanıcı her tuşa bastığında önceki sayacı sıfırla (aramayı iptal et)
+        // arama yaparken ıfırlanır
         clearTimeout(aramaZamanlayici);
 
-        // Kullanıcı yazmayı bıraktıktan 300 milisaniye (0.3 saniye) sonra aramayı yap
+        // Kullanıcı yazmayı bıraktıktan 300 milisaniye (0.3 saniye)
         aramaZamanlayici = setTimeout(() => {
             let searchPool = allData;
             if (currentCategory !== 'Hepsi') {
@@ -419,7 +411,7 @@
                 item.explanation.toLowerCase().includes(term)
             );
             renderTable(filtered);
-        }, 300); // Bekleme süresi (İstersen bu sayıyı 500 yapıp yarım saniye de beklemesini sağlayabilirsin)
+        }, 300); // bekleme süresi
     });
 
     const modal = document.getElementById('exampleModal');
