@@ -36,12 +36,18 @@
             background-color: var(--panel-bg);
             padding: 15px 40px;
             display: flex;
-            justify-content: space-between; /* Logoyu sola, linkleri sağa iter */
+            justify-content: space-between;
             align-items: center;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            position: sticky; /* Sayfa kaydırılsa bile üstte kalması için (isteğe bağlı) */
+            position: sticky;
             top: 0;
             z-index: 50;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .navbar.hidden {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
         }
 
         .logo-container img {
@@ -164,9 +170,42 @@
         @media (max-width: 768px) { 
             .main-container { flex-direction: column; } 
             .sidebar { max-height: none; } 
-            .navbar { flex-direction: column; gap: 15px; } /* Mobilde menü alt alta iner */
+            .navbar { flex-direction: column; gap: 15px; }
             .nav-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;}
             .nav-links a { margin: 0; }
+
+            /* Mobilde tablo gizle, kart görünümü göster */
+            table thead { display: none; }
+            table, tbody, tr, td { display: block; width: 100%; }
+            tr {
+                background: rgba(255,255,255,0.03);
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                margin-bottom: 10px;
+                padding: 12px;
+                box-sizing: border-box;
+            }
+            tr:hover { background-color: #353544; }
+            td {
+                padding: 4px 8px;
+                border-bottom: none;
+                font-size: 0.95em;
+            }
+            td:nth-child(1) {
+                font-size: 1.2em;
+                font-weight: bold;
+                color: #fff;
+                min-width: unset;
+                width: 100%;
+                padding-bottom: 6px;
+                border-bottom: 1px solid var(--border-color) !important;
+                margin-bottom: 4px;
+            }
+            td:nth-child(2) { color: var(--accent-color); font-size: 0.9em; width: 100%; }
+            td:nth-child(2)::before { content: "Romaji: "; color: #666; font-size: 0.85em; }
+            td:nth-child(3)::before { content: "Türkçe: "; color: #666; font-size: 0.85em; }
+            td:nth-child(4)::before { content: "Açıklama: "; color: #666; font-size: 0.85em; }
+            td:nth-child(4) { color: #bbb; font-size: 0.85em; }
         }
     </style>
 </head>
@@ -406,8 +445,22 @@
     window.onclick = function(event) { if (event.target == modal) { closeModal(); } }
 
     const scrollBtn = document.getElementById('scrollTopBtn');
+    const navbar = document.querySelector('.navbar');
+    let lastScrollY = 0;
+
     window.addEventListener('scroll', () => {
-        scrollBtn.style.display = window.scrollY > 300 ? 'block' : 'none';
+        const currentScrollY = window.scrollY;
+
+        // Navbar gizle/göster
+        if (currentScrollY > 10 && currentScrollY > lastScrollY) {
+            navbar.classList.add('hidden');
+        } else {
+            navbar.classList.remove('hidden');
+        }
+        lastScrollY = currentScrollY;
+
+        // Başa dön butonu
+        scrollBtn.style.display = currentScrollY > 300 ? 'block' : 'none';
     });
 </script>
 </body>
