@@ -146,6 +146,119 @@
             font-weight: bold;
         }
 
+        /* GÜNCELLEME KAYDI PANELİ */
+        .changelog-panel {
+            margin-top: 16px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .changelog-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+        .changelog-header:hover {
+            background-color: rgba(77,166,255,0.08);
+        }
+        .changelog-header h4 {
+            margin: 0;
+            font-size: 0.85em;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .changelog-badge {
+            background-color: var(--accent-color);
+            color: #fff;
+            font-size: 0.75em;
+            font-weight: bold;
+            padding: 1px 7px;
+            border-radius: 20px;
+            display: none;
+        }
+        .changelog-badge.visible { display: inline-block; }
+        .changelog-toggle-icon {
+            color: #888;
+            font-size: 12px;
+            transition: transform 0.3s;
+        }
+        .changelog-toggle-icon.open { transform: rotate(180deg); }
+        .changelog-body {
+            display: none;
+            padding: 10px 12px 12px;
+            border-top: 1px solid var(--border-color);
+            max-height: 260px;
+            overflow-y: auto;
+        }
+        .changelog-body.open { display: block; }
+        .changelog-date {
+            font-size: 0.75em;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .changelog-empty {
+            font-size: 0.8em;
+            color: #666;
+            text-align: center;
+            padding: 10px 0;
+        }
+        .changelog-section {
+            margin-bottom: 10px;
+        }
+        .changelog-section-title {
+            font-size: 0.75em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 5px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+        .cl-added .changelog-section-title   { color: #4caf50; background: rgba(76,175,80,0.1); }
+        .cl-removed .changelog-section-title { color: #f44336; background: rgba(244,67,54,0.1); }
+        .cl-changed .changelog-section-title { color: #ff9800; background: rgba(255,152,0,0.1); }
+        .changelog-item {
+            font-size: 0.78em;
+            color: #ccc;
+            padding: 3px 0 3px 8px;
+            border-left: 2px solid;
+            margin-bottom: 3px;
+            line-height: 1.4;
+        }
+        .cl-added .changelog-item   { border-color: #4caf50; }
+        .cl-removed .changelog-item { border-color: #f44336; }
+        .cl-changed .changelog-item { border-color: #ff9800; }
+        .cl-changed .changelog-item .old-val {
+            text-decoration: line-through;
+            color: #888;
+            font-size: 0.9em;
+        }
+        .cl-changed .changelog-item .new-val {
+            color: #fff;
+        }
+        .changelog-clear-btn {
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+            padding: 5px;
+            background: none;
+            border: 1px solid var(--border-color);
+            color: #666;
+            font-size: 0.75em;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .changelog-clear-btn:hover { border-color: #f44336; color: #f44336; }
+
         #scrollTopBtn {
             display: none;
             position: fixed;
@@ -235,6 +348,20 @@
                 <button class="letter-btn active full-list-btn" onclick="filterByLetter('Hepsi')">Tüm Liste</button>
                 <div id="letterContainer" style="display: contents;"></div>
             </div>
+        <!-- GÜNCELLEME KAYDI PANELİ -->
+        <div class="changelog-panel">
+            <div class="changelog-header" onclick="toggleChangelog()">
+                <h4>
+                    📋 Güncelleme Kaydı
+                    <span class="changelog-badge" id="changelogBadge"></span>
+                </h4>
+                <span class="changelog-toggle-icon" id="changelogIcon">▼</span>
+            </div>
+            <div class="changelog-body" id="changelogBody">
+                <div id="changelogContent" class="changelog-empty">Yükleniyor...</div>
+                <button class="changelog-clear-btn" onclick="clearChangelogHistory()">🗑 Geçmişi Sıfırla</button>
+            </div>
+        </div>
         </div>
 
         <div class="content">
@@ -297,7 +424,146 @@
         return char.normalize('NFD').charAt(0);
     }
 
-    Papa.parse(csvUrl, {
+    // ─── GÜNCELLEME KAYDI (CHANGELOG) ────────────────────────────────────────
+
+    const STORAGE_KEY = 'sfxSozluk_snapshot_v1';
+
+    function buildSnapshotMap(data) {
+        const map = {};
+        data.forEach(item => {
+            if (item.romaji) map[item.romaji] = {
+                japanese: item.japanese,
+                turkish: item.turkish,
+                explanation: item.explanation
+            };
+        });
+        return map;
+    }
+
+    function computeChangelog(oldMap, newMap) {
+        const added   = [];
+        const removed = [];
+        const changed = [];
+
+        for (const key in newMap) {
+            if (!oldMap[key]) {
+                added.push({ romaji: key, ...newMap[key] });
+            } else {
+                const o = oldMap[key], n = newMap[key];
+                const diffs = [];
+                if (o.turkish !== n.turkish)
+                    diffs.push({ field: 'Türkçe', old: o.turkish, new: n.turkish });
+                if (o.explanation !== n.explanation)
+                    diffs.push({ field: 'Açıklama', old: o.explanation, new: n.explanation });
+                if (o.japanese !== n.japanese)
+                    diffs.push({ field: 'Japonca', old: o.japanese, new: n.japanese });
+                if (diffs.length) changed.push({ romaji: key, ...newMap[key], diffs });
+            }
+        }
+        for (const key in oldMap) {
+            if (!newMap[key]) removed.push({ romaji: key, ...oldMap[key] });
+        }
+        return { added, removed, changed };
+    }
+
+    function renderChangelog(changelog, lastDate) {
+        const el = document.getElementById('changelogContent');
+        const badge = document.getElementById('changelogBadge');
+        const { added, removed, changed } = changelog;
+        const total = added.length + removed.length + changed.length;
+
+        if (lastDate) {
+            // Tarih satırı
+        }
+
+        if (total === 0) {
+            el.innerHTML = `<div class="changelog-empty">✅ Son çekimden bu yana değişiklik yok.</div>
+                ${lastDate ? `<div class="changelog-date">Son kontrol: ${lastDate}</div>` : ''}`;
+            badge.classList.remove('visible');
+            return;
+        }
+
+        badge.textContent = total;
+        badge.classList.add('visible');
+
+        let html = lastDate ? `<div class="changelog-date">Son kontrol: ${lastDate}</div>` : '';
+
+        if (added.length) {
+            html += `<div class="changelog-section cl-added">
+                <div class="changelog-section-title">+ ${added.length} Yeni Kelime</div>
+                ${added.slice(0, 20).map(w =>
+                    `<div class="changelog-item"><strong>${w.japanese}</strong> (${w.romaji}) — ${w.turkish}</div>`
+                ).join('')}
+                ${added.length > 20 ? `<div class="changelog-item" style="color:#888">...ve ${added.length-20} tane daha</div>` : ''}
+            </div>`;
+        }
+        if (removed.length) {
+            html += `<div class="changelog-section cl-removed">
+                <div class="changelog-section-title">− ${removed.length} Kaldırılan Kelime</div>
+                ${removed.slice(0, 10).map(w =>
+                    `<div class="changelog-item"><strong>${w.japanese}</strong> (${w.romaji})</div>`
+                ).join('')}
+                ${removed.length > 10 ? `<div class="changelog-item" style="color:#888">...ve ${removed.length-10} tane daha</div>` : ''}
+            </div>`;
+        }
+        if (changed.length) {
+            html += `<div class="changelog-section cl-changed">
+                <div class="changelog-section-title">✎ ${changed.length} Güncellenen Anlam</div>
+                ${changed.slice(0, 15).map(w =>
+                    `<div class="changelog-item">
+                        <strong>${w.japanese}</strong> (${w.romaji})<br>
+                        ${w.diffs.map(d =>
+                            `<span style="font-size:0.85em;color:#aaa">${d.field}:</span>
+                             <span class="old-val">${d.old || '—'}</span>
+                             → <span class="new-val">${d.new || '—'}</span>`
+                        ).join('<br>')}
+                    </div>`
+                ).join('')}
+                ${changed.length > 15 ? `<div class="changelog-item" style="color:#888">...ve ${changed.length-15} tane daha</div>` : ''}
+            </div>`;
+        }
+
+        el.innerHTML = html;
+    }
+
+    function processChangelog(newData) {
+        const newMap = buildSnapshotMap(newData);
+        const stored = localStorage.getItem(STORAGE_KEY);
+        const now = new Date().toLocaleString('tr-TR');
+
+        if (!stored) {
+            // İlk yükleme — sadece snapshot kaydet
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ map: newMap, date: now }));
+            document.getElementById('changelogContent').innerHTML =
+                `<div class="changelog-empty">📌 İlk snapshot kaydedildi (${newData.length} kelime). Sonraki yüklemede değişiklikler burada gösterilecek.</div>`;
+            return;
+        }
+
+        const { map: oldMap, date: oldDate } = JSON.parse(stored);
+        const changelog = computeChangelog(oldMap, newMap);
+        renderChangelog(changelog, oldDate);
+
+        // Snapshot güncelle
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ map: newMap, date: now }));
+    }
+
+    function toggleChangelog() {
+        const body = document.getElementById('changelogBody');
+        const icon = document.getElementById('changelogIcon');
+        body.classList.toggle('open');
+        icon.classList.toggle('open');
+    }
+
+    function clearChangelogHistory() {
+        localStorage.removeItem(STORAGE_KEY);
+        document.getElementById('changelogContent').innerHTML =
+            `<div class="changelog-empty">🗑 Geçmiş temizlendi. Sayfa yenilendiğinde yeni snapshot alınacak.</div>`;
+        document.getElementById('changelogBadge').classList.remove('visible');
+    }
+
+    // ─── VERİ YÜKLEME ─────────────────────────────────────────────────────────
+
+
         download: true,
         header: false,
         complete: function(results) {
@@ -319,6 +585,7 @@
 
             initSidebar();
             renderTable(allData);
+            processChangelog(allData);
         }
     });
 
