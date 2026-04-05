@@ -135,6 +135,62 @@
             text-decoration: underline;
         }
 
+        /* SON GÜNCELLEMELER PANELİ */
+        .updates-panel {
+            background-color: var(--panel-bg);
+            border-radius: 8px;
+            min-width: 240px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            overflow: hidden;
+            margin-top: 12px;
+        }
+        .updates-panel h3 {
+            margin: 0;
+            color: var(--accent-color);
+            text-align: center;
+            background-color: #22222e;
+            padding: 10px 15px;
+            font-size: 0.85em;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .update-item {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            padding: 8px 14px;
+            border-bottom: 1px solid rgba(63,63,78,0.5);
+            font-size: 0.8em;
+            line-height: 1.4;
+            transition: background 0.15s;
+        }
+        .update-item:last-child {
+            border-bottom: none;
+        }
+        .update-item:hover {
+            background-color: #32323f;
+        }
+        .update-date {
+            color: var(--accent-color);
+            font-weight: bold;
+            white-space: nowrap;
+            flex-shrink: 0;
+            font-size: 0.95em;
+        }
+        .update-sep {
+            color: #555;
+            flex-shrink: 0;
+        }
+        .update-desc {
+            color: #ccc;
+        }
+        .update-desc .add {
+            color: #5dca82;
+            font-weight: bold;
+        }
+
+
         .word-counter {
             text-align: right;
             font-size: 0.85em;
@@ -229,11 +285,20 @@
     </div>
 
     <div class="main-container">
-        <div class="sidebar">
-            <h3>Kanalara Göre</h3>
-            <div class="letter-grid">
-                <button class="letter-btn active full-list-btn" onclick="filterByLetter('Hepsi')">Tüm Liste</button>
-                <div id="letterContainer" style="display: contents;"></div>
+        <div style="display:flex; flex-direction:column;">
+            <div class="sidebar">
+                <h3>Kanalara Göre</h3>
+                <div class="letter-grid">
+                    <button class="letter-btn active full-list-btn" onclick="filterByLetter('Hepsi')">Tüm Liste</button>
+                    <div id="letterContainer" style="display: contents;"></div>
+                </div>
+            </div>
+
+            <div class="updates-panel">
+                <h3>Son Güncellemeler</h3>
+                <div id="updatesContainer">
+                    <div class="update-item"><span class="update-desc" style="color:#666;">Yükleniyor...</span></div>
+                </div>
             </div>
         </div>
 
@@ -310,7 +375,8 @@
                 romaji: row[1] ? row[1].trim() : '',
                 turkish: row[2] ? row[2].trim() : '',
                 explanation: row[3] ? row[3].trim() : '',
-                example: row[4] ? row[4].trim() : '' 
+                example: row[4] ? row[4].trim() : '',
+                updateDate: row[5] ? row[5].trim() : ''
             })).filter(item => item.romaji !== '' || item.japanese !== '');
 
             allData.sort((a, b) => {
@@ -319,8 +385,53 @@
 
             initSidebar();
             renderTable(allData);
+            buildUpdatesPanel(allData);
         }
     });
+
+    function buildUpdatesPanel(data) {
+        function normalizeDate(raw) {
+            if (!raw) return null;
+            let s = raw.replace(/[^0-9.\/\-]/g, '').trim();
+            s = s.replace(/[\/\-]/g, '.');
+            let parts = s.split('.').filter(p => p.length > 0);
+            if (parts.length < 2) return null;
+            let day = parts[0].padStart(2, '0');
+            let month = parts[1].padStart(2, '0');
+            let year = parts[2] ? parts[2] : new Date().getFullYear().toString();
+            return { label: `${day}.${month}`, sortKey: parseInt(year) * 10000 + parseInt(month) * 100 + parseInt(day) };
+        }
+
+        const groups = {};
+        data.forEach(item => {
+            const d = normalizeDate(item.updateDate);
+            if (!d) return;
+            if (!groups[d.label]) groups[d.label] = { count: 0, sortKey: d.sortKey };
+            groups[d.label].count++;
+            groups[d.label].sortKey = Math.max(groups[d.label].sortKey, d.sortKey);
+        });
+
+        const sortedKeys = Object.keys(groups).sort((a, b) => groups[b].sortKey - groups[a].sortKey);
+
+        const container = document.getElementById('updatesContainer');
+        container.innerHTML = '';
+
+        if (sortedKeys.length === 0) {
+            container.innerHTML = '<div class="update-item"><span class="update-desc" style="color:#666;">Henüz güncelleme yok</span></div>';
+            return;
+        }
+
+        sortedKeys.slice(0, 5).forEach(key => {
+            const div = document.createElement('div');
+            div.className = 'update-item';
+            div.innerHTML = `
+                <span class="update-date">${key}</span>
+                <span class="update-sep">|</span>
+                <span class="update-desc"><span class="add">+${groups[key].count} ekleme</span></span>
+            `;
+            container.appendChild(div);
+        });
+    }
 
     function initSidebar() {
         const container = document.getElementById('letterContainer');
