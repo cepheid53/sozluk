@@ -98,7 +98,7 @@
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: top; }
         th { background-color: var(--bg-color); color: var(--accent-color); position: sticky; top: 0; z-index: 5; font-weight: bold; text-transform: uppercase; font-size: 0.9em; }
         
-        th:nth-child(1), td:nth-child(1) { min-width: 180px; width: 200px; }
+        th:nth-child(1), td:nth-child(1) { min-width: 180px; width: 220px; }
         th:nth-child(2), td:nth-child(2) { width: 100px; color: #aaa; }
 
         tr:hover { background-color: #353544; }
@@ -113,13 +113,92 @@
         .close-btn:hover { color: #fff; }
         #modalDetails { margin-top: 20px; line-height: 1.6; color: #ddd; text-align: center; }
 
-        /* YENİ: SAYFALAMA STİLLERİ */
+        /* SAYFALAMA STİLLERİ */
         .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
         .page-btn { background-color: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); padding: 8px 12px; border-radius: 4px; cursor: pointer; transition: 0.2s; font-weight: bold; }
         .page-btn:hover:not(:disabled), .page-btn.active { background-color: var(--accent-color); color: #fff; border-color: var(--accent-color); }
         .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        /* YENİ: ALT BİLGİ (FOOTER) */
+        /* ARAMA VURGUSU (HIGHLIGHT) VE YENİ KOPYALAMA İKONLARI */
+        .highlight {
+            background-color: rgba(255, 215, 0, 0.25);
+            color: #ffd700;
+            border-radius: 3px;
+            padding: 0 2px;
+            font-weight: bold;
+        }
+
+        .copy-wrapper {
+            display: inline-flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #888;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            opacity: 0; /* Normalde tamamen gizli */
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2px;
+        }
+        
+        tr:hover .copy-btn {
+            opacity: 1; /* Sadece satırın üzerine gelince göster */
+        }
+        
+        .copy-btn:hover { 
+            color: #fff; 
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+        
+        .copy-btn svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        /* TOAST BİLDİRİMİ */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2b2b36;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: 1px solid var(--accent-color);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            z-index: 1000;
+            font-weight: bold;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .toast svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--accent-color);
+        }
+
+        /* ALT BİLGİ (FOOTER) */
         footer {
             background-color: var(--panel-bg);
             text-align: center;
@@ -167,41 +246,15 @@
             line-height: 1.4;
             transition: background 0.15s;
         }
-        .update-item:last-child {
-            border-bottom: none;
-        }
-        .update-item:hover {
-            background-color: #32323f;
-        }
-        .update-date {
-            color: var(--accent-color);
-            font-weight: bold;
-            white-space: nowrap;
-            flex-shrink: 0;
-            font-size: 0.95em;
-        }
-        .update-sep {
-            color: #555;
-            flex-shrink: 0;
-        }
-        .update-desc {
-            color: #ccc;
-        }
-        .update-desc .add {
-            color: #5dca82;
-            font-weight: bold;
-        }
+        .update-item:last-child { border-bottom: none; }
+        .update-item:hover { background-color: #32323f; }
+        .update-date { color: var(--accent-color); font-weight: bold; white-space: nowrap; flex-shrink: 0; font-size: 0.95em; }
+        .update-sep { color: #555; flex-shrink: 0; }
+        .update-desc { color: #ccc; }
+        .update-desc .add { color: #5dca82; font-weight: bold; }
 
-        .word-counter {
-            text-align: right;
-            font-size: 0.85em;
-            color: #888;
-            margin-bottom: 8px;
-        }
-        .word-counter span {
-            color: var(--accent-color);
-            font-weight: bold;
-        }
+        .word-counter { text-align: right; font-size: 0.85em; color: #888; margin-bottom: 8px; }
+        .word-counter span { color: var(--accent-color); font-weight: bold; }
 
         #scrollTopBtn {
             display: none;
@@ -220,10 +273,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.4);
             transition: opacity 0.3s, transform 0.3s;
         }
-        #scrollTopBtn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 16px rgba(77,166,255,0.4);
-        }
+        #scrollTopBtn:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(77,166,255,0.4); }
 
         @media (max-width: 768px) { 
             .main-container { flex-direction: column; } 
@@ -243,16 +293,12 @@
                 box-sizing: border-box;
             }
             tr:hover { background-color: #353544; }
-            td {
-                padding: 4px 8px;
-                border-bottom: none;
-                font-size: 0.95em;
-            }
+            td { padding: 4px 8px; border-bottom: none; font-size: 0.95em; }
+            
             td:nth-child(1) {
                 font-size: 1.2em;
                 font-weight: bold;
                 color: #fff;
-                min-width: unset;
                 width: 100%;
                 padding-bottom: 6px;
                 border-bottom: 1px solid var(--border-color) !important;
@@ -260,9 +306,12 @@
             }
             td:nth-child(2) { color: var(--accent-color); font-size: 0.9em; width: 100%; }
             td:nth-child(2)::before { content: "Romaji: "; color: #666; font-size: 0.85em; }
-            td:nth-child(3)::before { content: "Türkçe: "; color: #666; font-size: 0.85em; }
+            td:nth-child(3)::before { content: "Türkçe: "; color: #666; font-size: 0.85em; display: block; margin-bottom: 2px;}
             td:nth-child(4)::before { content: "Açıklama: "; color: #666; font-size: 0.85em; }
-            td:nth-child(4) { color: #bbb; font-size: 0.85em; }
+            td:nth-child(4) { color: #bbb; font-size: 0.85em; margin-top: 8px;}
+            
+            /* Mobilde ikonlar görünür kalsın ama saydam olsun */
+            .copy-btn { opacity: 0.4; }
         }
     </style>
 </head>
@@ -304,7 +353,7 @@
         </div>
 
         <div class="content">
-            <input type="text" id="searchInput" class="search-box" placeholder="Seçili harf içinde ara (Japonca, Romaji, Türkçe)...">
+            <input type="text" id="searchInput" class="search-box" placeholder="Japonca, Romaji veya Türkçe ara (Hiragana/Katakana destekli)...">
             <div class="word-counter" id="wordCounter">Yükleniyor...</div>
             <table>
                 <thead>
@@ -319,7 +368,6 @@
                     <tr><td colspan="4" class="loading">Veritabanı yükleniyor...</td></tr>
                 </tbody>
             </table>
-            <!-- SAYFALAMA KONTEYNERİ -->
             <div id="paginationContainer" class="pagination"></div>
         </div>
     </div>
@@ -340,6 +388,11 @@
 
 <button id="scrollTopBtn" title="Başa dön" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
+<div id="toast" class="toast">
+    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+    <span id="toastText">Kopyalandı!</span>
+</div>
+
 <script>
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTvI9TzWNvNo1xMHE1t8lmeY8Ma6gsVxA0pftYke_tw7nOykjkQLypp1AjOl2iaN000i2dpvquzgRhX/pub?gid=0&single=true&output=csv";
     
@@ -358,46 +411,90 @@
     ];
     
     let allData = [];
-    let currentDisplayData = []; // Filtrelenmiş veya tüm veriyi tutacak dizi
+    let currentDisplayData = [];
     let currentCategory = 'Hepsi'; 
-
-    // SAYFALAMA DEĞİŞKENLERİ
     let currentPage = 1;
-    const itemsPerPage = 50; // Tek sayfada gösterilecek kelime sayısı
+    const itemsPerPage = 50; 
+
+    const CACHE_KEY = 'cepheid_sfx_data';
+    const CACHE_TIME = 'cepheid_sfx_time';
+    const CACHE_DURATION = 60 * 60 * 1000; 
+    let currentSearchTerm = ''; 
 
     function getCleanFirstChar(str) {
         let char = str.trim().charAt(0);
         return char.normalize('NFD').charAt(0);
     }
 
-    Papa.parse(csvUrl, {
-        download: true,
-        header: false,
-        complete: function(results) {
-            let rows = results.data;
-            rows.shift(); 
+    function hiraganaToKatakana(str) {
+        return str.replace(/[\u3041-\u3096]/g, match => String.fromCharCode(match.charCodeAt(0) + 0x60));
+    }
 
-            allData = rows.map((row, index) => ({
-                id: index,
-                japanese: row[0] ? row[0].trim() : '',
-                romaji: row[1] ? row[1].trim() : '',
-                turkish: row[2] ? row[2].trim() : '',
-                explanation: row[3] ? row[3].trim() : '',
-                example: row[4] ? row[4].trim() : '',
-                updateDate: row[5] ? row[5].trim() : ''
-            })).filter(item => item.romaji !== '' || item.japanese !== '');
+    // Şık Kopyalama ve Toast Fonksiyonu
+    function copyText(element) {
+        const textToCopy = decodeURIComponent(element.getAttribute('data-copy'));
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastText').innerText = `"${textToCopy}" panoya kopyalandı!`;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        });
+    }
 
-            allData.sort((a, b) => {
-                return a.romaji.localeCompare(b.romaji, 'en');
-            });
+    function checkHashForSearch() {
+        const hash = window.location.hash;
+        if (hash.startsWith('#search=')) {
+            const query = decodeURIComponent(hash.substring(8));
+            const searchInput = document.getElementById('searchInput');
+            searchInput.value = query;
+            searchInput.dispatchEvent(new Event('keyup'));
+        }
+    }
 
+    function loadData() {
+        const cachedData = localStorage.getItem(CACHE_KEY);
+        const cachedTime = localStorage.getItem(CACHE_TIME);
+        const now = new Date().getTime();
+
+        if (cachedData && cachedTime && (now - cachedTime < CACHE_DURATION)) {
+            allData = JSON.parse(cachedData);
             initSidebar();
             buildUpdatesPanel(allData);
-            
-            // Tüm veriyi ekrana basmak yerine sayfalama fonksiyonuna gönderiyoruz
             updateDisplayData(allData);
+            checkHashForSearch(); 
+        } else {
+            Papa.parse(csvUrl, {
+                download: true,
+                header: false,
+                complete: function(results) {
+                    let rows = results.data;
+                    rows.shift(); 
+
+                    allData = rows.map((row, index) => ({
+                        id: index,
+                        japanese: row[0] ? row[0].trim() : '',
+                        romaji: row[1] ? row[1].trim() : '',
+                        turkish: row[2] ? row[2].trim() : '',
+                        explanation: row[3] ? row[3].trim() : '',
+                        example: row[4] ? row[4].trim() : '',
+                        updateDate: row[5] ? row[5].trim() : ''
+                    })).filter(item => item.romaji !== '' || item.japanese !== '');
+
+                    allData.sort((a, b) => a.romaji.localeCompare(b.romaji, 'en'));
+
+                    localStorage.setItem(CACHE_KEY, JSON.stringify(allData));
+                    localStorage.setItem(CACHE_TIME, now.toString());
+
+                    initSidebar();
+                    buildUpdatesPanel(allData);
+                    updateDisplayData(allData);
+                    checkHashForSearch(); 
+                }
+            });
         }
-    });
+    }
+
+    loadData();
 
     function buildUpdatesPanel(data) {
         function normalizeDate(raw) {
@@ -422,7 +519,6 @@
         });
 
         const sortedKeys = Object.keys(groups).sort((a, b) => groups[b].sortKey - groups[a].sortKey);
-
         const container = document.getElementById('updatesContainer');
         container.innerHTML = '';
 
@@ -434,11 +530,7 @@
         sortedKeys.slice(0, 5).forEach(key => {
             const div = document.createElement('div');
             div.className = 'update-item';
-            div.innerHTML = `
-                <span class="update-date">${key}</span>
-                <span class="update-sep">|</span>
-                <span class="update-desc"><span class="add">+${groups[key].count} ekleme</span></span>
-            `;
+            div.innerHTML = `<span class="update-date">${key}</span><span class="update-sep">|</span><span class="update-desc"><span class="add">+${groups[key].count} ekleme</span></span>`;
             container.appendChild(div);
         });
     }
@@ -461,14 +553,19 @@
         });
     }
 
-    // YENİ: Veriyi sayfalamaya uygun hazırlayan ara fonksiyon
     function updateDisplayData(data) {
         currentDisplayData = data;
-        currentPage = 1; // Yeni filtrede her zaman 1. sayfadan başlat
+        currentPage = 1; 
         renderCurrentPage();
     }
 
-    // YENİ: Sadece aktif sayfanın içeriğini ekrana basan fonksiyon
+    function highlightText(text, term) {
+        if (!term) return text;
+        const escapeRegExp = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(${escapeRegExp(term)})`, 'gi');
+        return text.replace(regex, '<span class="highlight">$1</span>');
+    }
+
     function renderCurrentPage() {
         const tbody = document.getElementById('tableBody');
         const counter = document.getElementById('wordCounter');
@@ -484,12 +581,12 @@
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
         const pageData = currentDisplayData.slice(startIndex, endIndex);
-
         const totalPages = Math.ceil(currentDisplayData.length / itemsPerPage);
 
         counter.innerHTML = `Toplam <span>${allData.length}</span> kelimeden <span>${currentDisplayData.length}</span> tanesi filtrelendi (Sayfa ${currentPage} / ${totalPages})`;
 
         let tableHTML = '';
+        const svgIcon = `<svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>`;
 
         pageData.forEach(item => {
             let formattedJapanese = item.japanese.replace(/,\s*/g, ',<br>').replace(/\n/g, '<br>');
@@ -497,12 +594,30 @@
             let formattedExp = item.explanation.replace(/(\(\d+\))/g, '<br><span style="color:var(--accent-color);">$1</span>').replace(/^<br>/, '');
             let moreButton = item.example !== '' ? `<br><span class="more-link" onclick="openModal(${item.id})">Daha Fazla Örnek »</span>` : '';
 
+            let hJapanese = highlightText(formattedJapanese, currentSearchTerm);
+            let hRomaji = highlightText(item.romaji, currentSearchTerm);
+            let hTurkish = highlightText(formattedTurkish, currentSearchTerm);
+            let hExp = highlightText(formattedExp, currentSearchTerm);
+
+            let copyJp = `<button class="copy-btn" data-copy="${encodeURIComponent(item.japanese)}" onclick="copyText(this)" title="Japoncayı Kopyala">${svgIcon}</button>`;
+            let copyTr = `<button class="copy-btn" data-copy="${encodeURIComponent(item.turkish)}" onclick="copyText(this)" title="Türkçesini Kopyala">${svgIcon}</button>`;
+
             tableHTML += `
                 <tr>
-                    <td style="font-size: 1.25em; font-weight: bold; line-height: 1.4; color: #fff;">${formattedJapanese}</td>
-                    <td style="font-size: 1.05em;">${item.romaji}</td>
-                    <td>${formattedTurkish}</td>
-                    <td style="font-size: 0.9em; color: #bbb;">${formattedExp} ${moreButton}</td>
+                    <td style="font-size: 1.25em; font-weight: bold; line-height: 1.4; color: #fff;">
+                        <div class="copy-wrapper">
+                            <span>${hJapanese}</span>
+                            ${copyJp}
+                        </div>
+                    </td>
+                    <td style="font-size: 1.05em;">${hRomaji}</td>
+                    <td>
+                        <div class="copy-wrapper">
+                            <span>${hTurkish}</span> 
+                            ${copyTr}
+                        </div>
+                    </td>
+                    <td style="font-size: 0.9em; color: #bbb;">${hExp} ${moreButton}</td>
                 </tr>`;
         });
 
@@ -510,15 +625,13 @@
         renderPaginationControls();
     }
 
-    // YENİ: Sayfalama butonlarını oluşturan fonksiyon
     function renderPaginationControls() {
         const container = document.getElementById('paginationContainer');
         container.innerHTML = '';
-        
         const totalItems = currentDisplayData.length;
         const totalPages = Math.ceil(totalItems / itemsPerPage);
         
-        if (totalPages <= 1) return; // Tek sayfa varsa sayfalama butonlarını gizle
+        if (totalPages <= 1) return; 
 
         const createBtn = (text, page, isActive = false, isDisabled = false) => {
             const btn = document.createElement('button');
@@ -526,22 +639,19 @@
             btn.innerText = text;
             btn.disabled = isDisabled;
             if (isActive) btn.classList.add('active');
-            
             if (!isDisabled && !isActive) {
                 btn.onclick = () => {
                     currentPage = page;
                     renderCurrentPage();
-                    window.scrollTo({ top: 0, behavior: 'smooth' }); // Sayfa değiştiğinde yukarı kaydır
+                    window.scrollTo({ top: 0, behavior: 'smooth' }); 
                 };
             }
             return btn;
         };
 
-        // İlk ve Önceki butonları
         container.appendChild(createBtn('« İlk', 1, false, currentPage === 1));
         container.appendChild(createBtn('‹ Önc', currentPage - 1, false, currentPage === 1));
 
-        // Dinamik sayfa numaraları (Mevcut sayfanın 2 altı ve 2 üstünü gösterir)
         let startPage = Math.max(1, currentPage - 2);
         let endPage = Math.min(totalPages, currentPage + 2);
 
@@ -549,19 +659,20 @@
             container.appendChild(createBtn(i, i, i === currentPage));
         }
 
-        // Sonraki ve Son butonları
         container.appendChild(createBtn('Sonraki ›', currentPage + 1, false, currentPage === totalPages));
         container.appendChild(createBtn('Son »', totalPages, false, currentPage === totalPages));
     }
 
     function filterByLetter(letter, btnElement = null) {
         currentCategory = letter; 
+        currentSearchTerm = ''; 
 
         document.querySelectorAll('.letter-btn').forEach(b => b.classList.remove('active'));
         if(btnElement) btnElement.classList.add('active');
         else document.querySelector('.full-list-btn').classList.add('active');
 
         document.getElementById('searchInput').value = '';
+        window.history.replaceState(null, null, window.location.pathname); 
 
         if (letter === 'Hepsi') {
             updateDisplayData(allData);
@@ -572,20 +683,29 @@
     }
 
     let aramaZamanlayici;
-
     document.getElementById('searchInput').addEventListener('keyup', function() {
-        const term = this.value.toLowerCase();
+        const term = this.value.toLowerCase().trim();
+        currentSearchTerm = term; 
         
         clearTimeout(aramaZamanlayici);
 
         aramaZamanlayici = setTimeout(() => {
+            if (term) {
+                window.history.replaceState(null, null, `#search=${encodeURIComponent(term)}`);
+            } else {
+                window.history.replaceState(null, null, window.location.pathname);
+            }
+
             let searchPool = allData;
             if (currentCategory !== 'Hepsi') {
                 searchPool = allData.filter(item => getCleanFirstChar(item.japanese) === currentCategory);
             }
 
+            const termKana = hiraganaToKatakana(term);
+
             let filtered = searchPool.filter(item => 
                 item.japanese.toLowerCase().includes(term) ||
+                item.japanese.includes(termKana) ||
                 item.romaji.toLowerCase().includes(term) ||
                 item.turkish.toLowerCase().includes(term) ||
                 item.explanation.toLowerCase().includes(term)
@@ -622,7 +742,6 @@
 
     window.addEventListener('scroll', () => {
         const currentScrollY = window.scrollY;
-
         if (window.innerWidth <= 768) {
             if (currentScrollY <= 10) {
                 navbar.classList.remove('hidden');
@@ -632,8 +751,15 @@
         } else {
             navbar.classList.remove('hidden');
         }
-
         scrollBtn.style.display = currentScrollY > 300 ? 'block' : 'none';
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.style.display === 'flex') { closeModal(); }
+        if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+            e.preventDefault(); 
+            document.getElementById('searchInput').focus();
+        }
     });
 </script>
 </body>
